@@ -1,6 +1,37 @@
+"use client";
+
+import { useFrontendTool } from "@copilotkit/react-core";
 import { CopilotChat } from "@copilotkit/react-ui";
+import { useState } from "react";
 
 export default function Home() {
+  const [todos, setTodos] = useState<string[]>([]);
+  // Define Frontend Tool
+
+  useFrontendTool({
+    name: "addTodoItem",
+    description: "Add a new todo item to the list",
+    parameters: [
+      {
+        name: "todoText",
+        type: "string",
+        description: "The text of the todo item to add",
+        required: true,
+      },
+    ],
+    handler: async ({ todoText }) => {
+      setTodos([...todos, todoText]);
+    },
+  });
+
+  useFrontendTool({
+    name: "getTodos",
+    description: "Get the list of todo items",
+    handler: async () => {
+      return todos;
+    },
+  });
+
   return (
     <main className="h-screen w-screen">
       <CopilotChat
