@@ -17,7 +17,8 @@ const serviceAdapter = new LangChainAdapter({
     // return model.bindTools(tools, { strict: true }).stream(messages);
   },
 });
-const runtime = new CopilotRuntime();
+// TODO: CopilotRuntime must be initialized with an options object, even if empty ({}), to work properly.
+const runtime = new CopilotRuntime({});
 
 export const POST = async (req: NextRequest) => {
   const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
