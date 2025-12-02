@@ -1,23 +1,11 @@
 import {
   CopilotRuntime,
   copilotRuntimeNextJSAppRouterEndpoint,
-  LangChainAdapter,
+  OpenAIAdapter,
 } from "@copilotkit/runtime";
-import { ChatOpenAI } from "@langchain/openai";
 import type { NextRequest } from "next/server";
 
-const model = new ChatOpenAI({
-  model: "gpt-4o",
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const serviceAdapter = new LangChainAdapter({
-  chainFn: async ({ messages, tools }) => {
-    return model.bindTools(tools).stream(messages);
-    // or optionally enable strict mode
-    // return model.bindTools(tools, { strict: true }).stream(messages);
-  },
-});
-// TODO: CopilotRuntime must be initialized with an options object, even if empty ({}), to work properly.
+const serviceAdapter = new OpenAIAdapter();
 const runtime = new CopilotRuntime({});
 
 export const POST = async (req: NextRequest) => {
