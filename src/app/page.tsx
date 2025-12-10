@@ -1,7 +1,11 @@
 "use client";
 
 import { CopilotChat } from "@copilotkit/react-ui";
-import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
+import {
+  useCopilotAction,
+  useCopilotReadable,
+  useHumanInTheLoop,
+} from "@copilotkit/react-core";
 import { useState } from "react";
 
 export default function Home() {
@@ -30,6 +34,59 @@ export default function Home() {
         success: true,
         message: "Todo added successfully",
       };
+    },
+  });
+
+  useHumanInTheLoop({
+    name: "removeTodo",
+    description: "Remove a todo from the list",
+    parameters: [
+      {
+        name: "todo",
+        type: "string",
+        description: "The todo to remove",
+      },
+    ],
+    render: ({ args, status, respond }) => {
+      if (status !== "executing" || !respond) {
+        return <></>;
+      }
+
+      const { todo } = args;
+
+      const handleApprove = () => {
+        setTodos((prev) => prev.filter((t) => t !== todo));
+        respond({ success: true, message: "Todo removed successfully" });
+      };
+      const handleReject = () => {
+        respond({
+          success: false,
+          message: "USer cancelled the action. Todo not removed",
+        });
+      };
+
+      return (
+        <div className="flex flex-col gap-2 bg-gray-100 p-4 rounded-md border shadow-sm">
+          <p>Are you sure you want to remove {todo}?</p>
+
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleApprove}
+              className="bg-black text-white px-4 py-2 rounded-md"
+            >
+              Approve
+            </button>
+            <button
+              type="button"
+              onClick={handleReject}
+              className="border text-black px-4 py-2 rounded-md"
+            >
+              Reject
+            </button>
+          </div>
+        </div>
+      );
     },
   });
 
