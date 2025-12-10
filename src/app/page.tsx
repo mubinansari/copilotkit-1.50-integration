@@ -4,9 +4,17 @@ import { CopilotChat } from "@copilotkit/react-ui";
 import {
   useCopilotAction,
   useCopilotReadable,
-  useHumanInTheLoop,
+  // useHumanInTheLoop,
 } from "@copilotkit/react-core";
+import { useHumanInTheLoop } from "@copilotkit/react-core/v2";
 import { useState } from "react";
+import { z } from "zod";
+
+const previousTodos = [
+  "Buy groceries",
+  "Finish the project",
+  "Call the client",
+];
 
 export default function Home() {
   const [todos, setTodos] = useState<string[]>([]);
@@ -15,7 +23,7 @@ export default function Home() {
 
   useCopilotReadable({
     description: "My Todo List",
-    value: todos,
+    value: { todos, previousTodos },
   });
 
   useCopilotAction({
@@ -40,13 +48,9 @@ export default function Home() {
   useHumanInTheLoop({
     name: "removeTodo",
     description: "Remove a todo from the list",
-    parameters: [
-      {
-        name: "todo",
-        type: "string",
-        description: "The todo to remove",
-      },
-    ],
+    parameters: z.object({
+      todo: z.string().describe("The todo to remove"),
+    }),
     render: ({ args, status, respond }) => {
       if (status !== "executing" || !respond) {
         return <></>;
