@@ -1,6 +1,15 @@
+"use client";
+import { useCopilotReadable } from "@copilotkit/react-core";
 import { CopilotChat } from "@copilotkit/react-ui";
 
+const previousTodos = ["Buy groceries", "Finish project", "Call client"];
+
 export default function Home() {
+  useCopilotReadable({
+    description: "Previous todos",
+    value: previousTodos,
+  });
+
   return (
     <main className="h-screen w-screen">
       <CopilotChat
