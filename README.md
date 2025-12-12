@@ -38,3 +38,10 @@ The repository is organized into branches representing different stages and appr
   - Implemented basic hooks with zod parameters.
   - The implementation works, but throws error when trying to use zod/v4.
   - **Outcome**: The hooks may break or perform differently when using zod/v4.
+
+- **`07-copilot-1.50.0-with-ag-ui-langchain`**
+- Same outcome as `05-copilot-1.50.0-beta.8-with-ag-ui-langchain`
+
+- **`08-copilot-1.50.0-with-openai-adapter`**
+  - Same outcome as `06-copilot-1.50.0-beta.8-with-openai-adapter`
+  
