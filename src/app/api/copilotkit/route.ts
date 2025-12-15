@@ -22,6 +22,7 @@ type ChainFnReturn = Awaited<
 
 const agent = new LangChainAgent({
   chainFn: async ({ messages, tools, threadId, context }) => {
+    console.log({ messages, tools, threadId, context });
     const model = chatOpenAI.bindTools(
       tools as Parameters<ChatOpenAI["bindTools"]>[0],
       {
