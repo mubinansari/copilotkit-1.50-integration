@@ -8,6 +8,7 @@ import {
   ExperimentalEmptyAdapter,
 } from "@copilotkit/runtime";
 import { ChatOpenAI } from "@langchain/openai";
+import { SystemMessage } from "langchain";
 import type { NextRequest } from "next/server";
 
 const chatOpenAI = new ChatOpenAI({
@@ -20,14 +21,24 @@ type ChainFnReturn = Awaited<
 >;
 
 const agent = new LangChainAgent({
-  chainFn: async ({ messages, tools, threadId }) => {
+  chainFn: async ({ messages, tools, threadId, context }) => {
     const model = chatOpenAI.bindTools(
       tools as Parameters<ChatOpenAI["bindTools"]>[0],
       {
         strict: true,
       },
     );
-    return model.stream(messages as Parameters<typeof model.stream>[0], {
+
+    const allMessages = [
+      new SystemMessage(
+        `Context: ${context.map((c) => `${c.description}: ${c.value}`).join("\n")}`,
+      ),
+      ...messages,
+    ];
+
+    console.log({ messages: allMessages });
+
+    return model.stream(allMessages as Parameters<typeof model.stream>[0], {
       tools,
       metadata: { conversation_id: threadId },
     }) as unknown as ChainFnReturn;
