@@ -1,8 +1,8 @@
 "use client";
 
 import { CopilotChat } from "@copilotkit/react-ui";
-import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
-import { useHumanInTheLoop } from "@copilotkit/react-core/v2";
+import { useCopilotReadable } from "@copilotkit/react-core";
+import { useHumanInTheLoop, useFrontendTool } from "@copilotkit/react-core/v2";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -22,16 +22,12 @@ export default function Home() {
     value: { todos, previousTodos },
   });
 
-  useCopilotAction({
+  useFrontendTool({
     name: "addTodo",
     description: "Add a todo to the list",
-    parameters: [
-      {
-        name: "todo",
-        type: "string",
-        description: "The todo to add",
-      },
-    ],
+    parameters: z.object({
+      todo: z.string().describe("The todo to add"),
+    }),
     handler: async ({ todo }) => {
       setTodos((prev) => [...prev, todo]);
       return {
