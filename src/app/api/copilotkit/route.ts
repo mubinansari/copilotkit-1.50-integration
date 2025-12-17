@@ -7,13 +7,18 @@ import {
   copilotRuntimeNextJSAppRouterEndpoint,
   ExperimentalEmptyAdapter,
 } from "@copilotkit/runtime";
-import { ChatOpenAI } from "@langchain/openai";
-import { SystemMessage } from "langchain";
+import { SystemMessage } from "@langchain/core/messages";
+import { AzureChatOpenAI, type ChatOpenAI } from "@langchain/openai";
 import type { NextRequest } from "next/server";
 
-const chatOpenAI = new ChatOpenAI({
-  model: "gpt-4o",
-  apiKey: process.env.OPENAI_API_KEY,
+const chatOpenAI = new AzureChatOpenAI({
+  streaming: true,
+  model: "model-router",
+  azureOpenAIApiKey: process.env.AZURE_OPENAI_API_KEY,
+  azureOpenAIApiVersion: process.env.AZURE_OPENAI_API_VERSION,
+  azureOpenAIBasePath: process.env.AZURE_OPENAI_API_BASE_PATH,
+  azureOpenAIApiDeploymentName: "model-router",
+  streamUsage: true,
 });
 
 type ChainFnReturn = Awaited<

@@ -1,11 +1,7 @@
 "use client";
 
 import { CopilotChat } from "@copilotkit/react-ui";
-import {
-  useCopilotAction,
-  useCopilotReadable,
-  // useHumanInTheLoop,
-} from "@copilotkit/react-core";
+import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
 import { useHumanInTheLoop } from "@copilotkit/react-core/v2";
 import { useState } from "react";
 import { z } from "zod";
