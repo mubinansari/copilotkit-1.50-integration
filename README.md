@@ -41,3 +41,10 @@ The repository is organized into branches representing different stages and appr
 
 - **`07-copilot-1.50.0-with-ag-ui-langchain`**
 - Same outcome as `05-copilot-1.50.0-beta.8-with-ag-ui-langchain`
+
+- **`08-copilot-1.50.0-with-openai-adapter`**
+  - Same outcome as `06-copilot-1.50.0-beta.8-with-openai-adapter`
+
+- **`09-copilot-1.50.0-with-ag-ui-langchain`**
+  - In the production (build) version of the Next.js app, invoking a CopilotKit tool call results in a crash.
+  - After that, the chat stops working entirely, returning no response.
