@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "@ag-ui/langchain": "^0.0.1",
-    "@copilotkit/react-core": "^1.50.0",
-    "@copilotkit/react-ui": "^1.50.0",
-    "@copilotkit/runtime": "^1.50.0",
+    "@copilotkit/react-core": "^1.51.2",
+    "@copilotkit/react-ui": "^1.51.2",
+    "@copilotkit/runtime": "^1.51.2",
     "@langchain/core": "^0.3.79",
     "@langchain/openai": "^0.6.16",
     "langchain": "^0.3.36",
