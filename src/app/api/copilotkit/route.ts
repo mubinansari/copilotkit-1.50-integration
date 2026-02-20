@@ -1,30 +1,28 @@
+import { createAzure } from "@ai-sdk/azure-v5";
 import {
+  BuiltInAgent,
   CopilotRuntime,
-  copilotRuntimeNextJSAppRouterEndpoint,
-  LangChainAdapter,
-} from "@copilotkit/runtime";
-import { ChatOpenAI } from "@langchain/openai";
+  createCopilotEndpointSingleRoute,
+} from "@copilotkit/runtime/v2";
 import type { NextRequest } from "next/server";
 
-const model = new ChatOpenAI({
-  model: "gpt-4o",
-  apiKey: process.env.OPENAI_API_KEY,
+const azure = createAzure({
+  apiKey: process.env.AZURE_OPENAI_API_KEY,
+  apiVersion: "preview",
+  baseURL: process.env.AZURE_OPENAI_API_BASE_PATH_V1,
 });
-const serviceAdapter = new LangChainAdapter({
-  chainFn: async ({ messages, tools }) => {
-    return model.bindTools(tools).stream(messages);
-    // or optionally enable strict mode
-    // return model.bindTools(tools, { strict: true }).stream(messages);
-  },
+
+const agent = new BuiltInAgent({
+  model: azure("model-router"),
 });
-const runtime = new CopilotRuntime();
 
-export const POST = async (req: NextRequest) => {
-  const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
-    runtime,
-    serviceAdapter,
-    endpoint: "/api/copilotkit",
-  });
+const runtime = new CopilotRuntime({
+  agents: { default: agent },
+});
 
-  return handleRequest(req);
-};
+const app = createCopilotEndpointSingleRoute({
+  runtime,
+  basePath: "/api/copilotkit",
+});
+
+export const POST = async (req: NextRequest) => app.fetch(req);
