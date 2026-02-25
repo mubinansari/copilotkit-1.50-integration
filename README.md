@@ -1,50 +1,33 @@
-# CopilotKit v1.50 Integration Reproduction
+# CopilotKit + AI SDK v6 Incompatibility
 
-This repository documents the process and challenges encountered while attempting to integrate CopilotKit v1.50 (Beta 2) into a standard Next.js application. It serves as a reproducible example for the issues observed during the upgrade.
+CopilotKit (as of v1.51.4) is incompatible with AI SDK v6. The root cause is a breaking change in the AI SDK's language model specification:
 
-## Branch Overview
+| | AI SDK v5 | AI SDK v6 |
+|---|---|---|
+| Model type | `LanguageModelV2` | `LanguageModelV3` |
+| `specificationVersion` | `"v2"` | `"v3"` |
 
-The repository is organized into branches representing different stages and approaches to the integration:
+CopilotKit's `BuiltInAgentConfiguration` declares its `model` property as `LanguageModelV2`. When using any AI SDK v6 provider (e.g. `@ai-sdk/azure@^3.x`, `@ai-sdk/openai@^3.x`), the returned model objects are `LanguageModelV3`, which TypeScript correctly rejects:
 
-- **`main`**
-  - Base Next.js application, bootstrapped via the official CLI.
+```
+Type 'LanguageModelV3' is not assignable to type 'LanguageModelV2'.
+  Types of property 'specificationVersion' are incompatible.
+    Type '"v3"' is not assignable to type '"v2"'.
+```
 
-- **`01-copilot-stable`**
-  - Successful implementation of CopilotKit stable version with LangChain, following the official quickstart guide.
+### Screenshot
 
-- **`02-copilot-1.50`**
-  - Attempted upgrade to CopilotKit v1.50 beta.
-  - **Outcome**: Runtime failure with the error: `{ url: 'http://localhost:3000/api/copilotkit' } Invalid single-route payload`.
+![AI SDK v6 type error in route.ts](docs/error.png)
 
-- **`03-copilot-1.50-with-langchain-1.x`**
-  - Investigation into potential version conflicts by upgrading LangChain from v0.3.x (CopilotKit peer dependency) to v1.x.x.
-  - **Outcome**: Failed due to extensive type errors; approach abandoned.
+### Why we can't downgrade
 
-- **`04-copilot-1.50-with-openai-adapter`**
-  - Isolated test using the bare-bones `OpenAIAdapter` to rule out LangChain adapter specifics.
-  - **Outcome**: 
-    - **Partial Success**: Basic chat functionality and frontend tools (via `useCopilotAction`) work.
-    - **Issues**:
-      - The `copilotkitSuggest` payload (used for suggestion generation) triggers a console error: `{ url: 'http://localhost:3000/api/copilotkit' } Invalid single-route payload` and returns a `400 Bad Request` with `Missing method field`.
-      - **Critical Failure**: Adding `useCopilotReadable` causes the chat to stop working entirely, returning no response.
+Our production codebase depends on AI SDK v6 features that don't exist in v5, including the tool loop agent, new provider tools, and the updated streaming APIs. Downgrading to AI SDK v5 is not viable.
 
-- **`05-copilot-1.50.0-beta.8-with-ag-ui-langchain`**
-  - Attempted to use the `@ag-ui/langchain` package to integrate LangChain with CopilotKit.
-  - `useCopilotReadable` fails to deliver the "previous todos" that is defined in the `page.tsx` as context to the chat.
-  - **Outcome**: The chat works, but the "previous todos" are not available to the chat.
+### Reproduction
 
-- **`06-copilot-1.50.0-beta.8-with-openai-adapter`**
-  - Attempted to use the `OpenAIAdapter` with CopilotKit.
-  - Implemented basic hooks with zod parameters.
-  - The implementation works, but throws error when trying to use zod/v4.
-  - **Outcome**: The hooks may break or perform differently when using zod/v4.
-
-- **`07-copilot-1.50.0-with-ag-ui-langchain`**
-- Same outcome as `05-copilot-1.50.0-beta.8-with-ag-ui-langchain`
-
-- **`08-copilot-1.50.0-with-openai-adapter`**
-  - Same outcome as `06-copilot-1.50.0-beta.8-with-openai-adapter`
-
-- **`09-copilot-1.50.0-with-ag-ui-langchain`**
-  - In the production (build) version of the Next.js app, invoking a CopilotKit tool call results in a crash.
-  - After that, the chat stops working entirely, returning no response.
+```bash
+git clone <repo-url>
+git checkout 11-copilot-built-in-agent-with-ai-sdk-v6
+bun install
+# Open src/app/api/copilotkit/route.ts — the type error is visible immediately
+```

@@ -1,4 +1,4 @@
-import { createAzure } from "@ai-sdk/azure-v5";
+import { createAzure } from "@ai-sdk/azure";
 import {
   BuiltInAgent,
   CopilotRuntime,
